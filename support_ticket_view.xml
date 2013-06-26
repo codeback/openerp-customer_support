@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>       
+        <record id="view_ticket_tree" model="ir.ui.view">
+            <field name="name">support.ticket.tree</field>
+            <field name="model">support.ticket</field>
+            <field name="arch" type="xml">
+                <tree string="Support Ticket List">  
+                    <field name="email" invisible="1"/>                
+                    <field name="name" select="1"/> 
+                    <field name="subject" select="1"/>
+                    <field name="body" select="1"/>
+                    <field name="html" invisible="1"/>                
+                    <field name="date" readonly="1"/>                    
+                    <field name="labels" select="1"/>  
+                    <field name="status" select="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_ticket_form">
+            <field name="name">support.ticket.form</field>
+            <field name="model">support.ticket</field>
+            <field name="priority" eval="12"/>
+            <field name="arch" type="xml">
+                <form string="Ticket Details">                                      
+                    <group string="Ticket Information" colspan="4">
+                        <field name="email" invisible="1"/>                
+                        <field name="name" invisible="1"/> 
+                        <field name="subject" select="1"/>
+                        <field name="body" select="1"/>
+                        <field name="html" invisible="1"/>                
+                        <field name="date" invisible="1"/>                    
+                        <field name="labels" select="1"/>                       
+                    </group>         
+                </form>
+            </field>
+        </record>
+
+        <record id="action_support_ticket" model="ir.actions.act_window">
+            <field name="name">Support Tickets</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">support.ticket</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>            
+            <field name="help">List of Support Tickets</field>
+            <field name="view_id" ref="view_ticket_tree"/>
+        </record>       
+
+        <record forcecreate="True" model="ir.cron" id="ir_cron_update_tickets">
+            <field name='name'>Update ticket list</field>
+            <field name='interval_number'>1</field>
+            <field name='interval_type'>days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="doall" eval="False" />
+            <field name="model">support.ticket</field>
+            <field name="function">update_tickets</field>
+            <field name="args">()</field>
+        </record>
+
+        <record id="view_run_update_tickets" model="ir.ui.view">
+            <field name="name">Run ticket update process</field>
+            <field name="model">support.ticket.updater</field>
+            <field name="priority" eval="15"/>
+            <field name="arch" type="xml">
+                <form string="Run ticket update process manually" version="7.0">     
+                    <label string="
+If you press 'Run' button, the module will manually update the list of tickets"/>
+                    <footer>
+                        <button special="cancel" string="_Cancel" icon='gtk-cancel'/>
+                        or
+                         <button name="run_update_tickets" string="Run" type="object" icon="terp-gtk-go-back-rtl"/>
+                    </footer>
+                </form>
+            </field>
+        </record>    
+
+        <record id="action_update_tickets" model="ir.actions.act_window">
+            <field name="name">Update tickets</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">support.ticket.updater</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_run_update_tickets"/>
+        </record>
+
+        <record model="ir.ui.view" id="view_customer_support_settings_tree">
+            <field name="name">customer.support.settings.tree</field>
+            <field name="model">customer.support.settings</field>
+            <field name="arch" type="xml">
+                <tree string="Connection configuration">
+                    <field name="name" select="1"/>
+                    <field name="tor_api_key" select="1"/>
+                    <field name="tor_domain" select="1"/>                   
+                    <field name="company" select="1"/>  
+                    <field name="selected" select="1"/>                    
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_customer_support_settings_form">
+            <field name="name">customer.support.settings.form</field>
+            <field name="model">customer.support.settings</field>
+            <field name="priority" eval="12"/>
+            <field name="arch" type="xml">
+                <form string="Stock estimation settings">                                 
+                    <group string="Configuration Parameters" colspan="4">
+                        <field name="name"/>
+                        <field name="tor_api_key"/>
+                        <field name="tor_domain"/>                   
+                        <field name="company"/> 
+                        <field name="selected"/> 
+                    </group>         
+                </form>
+            </field>
+        </record>
+
+        <record id="action_customer_support_settings" model="ir.actions.act_window">
+            <field name="name">Customer support settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">customer.support.settings</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_customer_support_settings_tree"/>
+        </record>
+
+        <menuitem name="Customer Support" id="menu_customer_support" groups="stock.group_stock_manager,stock.group_stock_user" parent="stock.menu_stock_root" sequence="12"/>
+
+        <menuitem name="Ticket List" id="menu_action_support_ticket" groups="stock.group_stock_manager,stock.group_stock_user" parent="menu_customer_support" action="action_support_ticket" sequence="10"/>
+
+        <menuitem name="Run manually" id="menu_action_update_tickets_run" groups="stock.group_stock_manager,stock.group_stock_user" parent="menu_customer_support" action="action_update_tickets" sequence="15"/>
+
+        <menuitem name="Customer Support" id="menu_action_customer_support_settings" groups="stock.group_stock_manager,stock.group_stock_user" parent="stock.menu_stock_configuration" action="action_customer_support_settings" sequence="20"/>
+
+    </data>
+</openerp>
